@@ -6,6 +6,9 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float jumpForce; //Kekuatan Jump
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private LayerMask wallLayer;
+
+    [Header("SFX")]
+    [SerializeField] private AudioClip jumpSound;
     private float wallJumpCooldown;
     private Animator anim;
     private Rigidbody2D rb;
@@ -52,7 +55,9 @@ public class PlayerMovement : MonoBehaviour
                 rb.gravityScale = 3;
             }
             if (Input.GetKeyDown(KeyCode.Space) ) // Pakai GetKeyDown
-            Jump();
+                {
+                    Jump();
+                }
         }
         else
         {
@@ -66,6 +71,7 @@ public class PlayerMovement : MonoBehaviour
     private void Jump()
     {
         if (isGrounded()){
+            SoundManager.instance.PlaySound(jumpSound);
             rb.velocity = new Vector2(rb.velocity.x, jumpForce);
             anim.SetTrigger("jump");}
         else if(onWall() && !isGrounded())

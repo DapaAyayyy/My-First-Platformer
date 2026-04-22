@@ -17,6 +17,8 @@ public class RangedEnemy : MonoBehaviour
 
     [Header("Player Layer")]
     [SerializeField] private LayerMask playerLayer;
+    [Header("Audio Clip")]
+    [SerializeField] private AudioClip attackSound;
     private float cooldownTimer = Mathf.Infinity;
 
     //References
@@ -38,6 +40,7 @@ public class RangedEnemy : MonoBehaviour
         {
             if (cooldownTimer >= attackCooldown)
             {
+                SoundManager.instance.PlaySound(attackSound);
                 cooldownTimer = 0;
                 anim.SetTrigger("rangedAttack");
             }
