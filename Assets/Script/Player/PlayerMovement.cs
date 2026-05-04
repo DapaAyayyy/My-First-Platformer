@@ -41,27 +41,21 @@ public class PlayerMovement : MonoBehaviour
         anim.SetBool("grounded", isGrounded());
         
         //WallJump logic
-        if (wallJumpCooldown > 0.2f)
-        {
-            rb.velocity = new Vector2(horizontalInput * speed, rb.velocity.y);
+        if(Input.GetKeyDown(KeyCode.Space))
+            Jump();
 
-            if (onWall() && !isGrounded())
-            {
-                 rb.gravityScale = 0;
-                 rb.velocity = Vector2.zero;
-            }
-            else
-            {
-                rb.gravityScale = 3;
-            }
-            if (Input.GetKeyDown(KeyCode.Space) ) // Pakai GetKeyDown
-                {
-                    Jump();
-                }
+        if(Input.GetKeyUp(KeyCode.Space)&& rb.velocity.y > 0)
+            rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y / 2);
+
+        if (onWall())
+        {
+            rb.gravityScale = 0;
+            rb.velocity = Vector2.zero;
         }
         else
         {
-            wallJumpCooldown += Time.deltaTime;
+            rb.gravityScale = 7;
+            rb.velocity = new Vector2(horizontalInput*speed, rb.velocity.y);
         }
     }
 
@@ -73,7 +67,7 @@ public class PlayerMovement : MonoBehaviour
         if (isGrounded()){
             SoundManager.instance.PlaySound(jumpSound);
             rb.velocity = new Vector2(rb.velocity.x, jumpForce);
-            anim.SetTrigger("jump");}
+            }
         else if(onWall() && !isGrounded())
         {   if (horizontalInput == 0)
             {
