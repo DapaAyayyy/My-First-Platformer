@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
@@ -14,6 +15,17 @@ public class PlayerMovement : MonoBehaviour
     private Rigidbody2D rb;
     private BoxCollider2D boxCollider2D;
     private float horizontalInput;
+
+    [Header("Coyote Time")]
+    [SerializeField] private float coyoteTime;
+    private float coyoteCounter;
+
+    [Header("Multiple Jump")]
+    [SerializeField] private int extraJumps;
+    private int jumpCounter;
+    [Header("Wall Jumping")]
+    [SerializeField] private float wallJumpX;
+    [SerializeField] private float wallJumpY;
 
     private void Awake()
     {
@@ -56,6 +68,16 @@ public class PlayerMovement : MonoBehaviour
         {
             rb.gravityScale = 7;
             rb.velocity = new Vector2(horizontalInput*speed, rb.velocity.y);
+
+            if (isGrounded())
+            {
+                coyoteCounter = coyoteTime; //Mereset coyote counter ketika kita berada di tanah
+                jumpCounter = extraJumps; //Mereset jump counter ketika kita berada di tanah
+            }
+            else
+            {
+                coyoteCounter -= Time.deltaTime; //Mengurangi Coyote counter ketika kita tidak berada di tanah/ground
+            }
         }
     }
 
@@ -64,21 +86,40 @@ public class PlayerMovement : MonoBehaviour
 
     private void Jump()
     {
-        if (isGrounded()){
-            SoundManager.instance.PlaySound(jumpSound);
-            rb.velocity = new Vector2(rb.velocity.x, jumpForce);
-            }
-        else if(onWall() && !isGrounded())
-        {   if (horizontalInput == 0)
-            {
-                rb.velocity = new Vector2(-Mathf.Sign(transform.localScale.x) * 10 , 6);
-                transform.localScale = new Vector3(-Mathf.Sign(transform.localScale.x), transform.localScale.y,transform.localScale.z);
-            }
-            else 
-                rb.velocity = new Vector2(-Mathf.Sign(transform.localScale.x) * 3 , 6);
-            
-            wallJumpCooldown = 0;
+         //if coyote counter = 0, jump counter = 0 dan kita berada di dinding jangan lakukan apapun
+        if (coyoteCounter <= 0 && !onWall() && jumpCounter <= 0) return; 
+
+        SoundManager.instance.PlaySound(jumpSound);
+        if (onWall())
+        {
+            wallJump();
         }
+        else{
+            if (isGrounded())
+            {
+                rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+            }
+            else
+            {
+                if(coyoteCounter > 0)
+                    rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+                else
+                {
+                    if (jumpCounter > 0)
+                    {
+                        rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+                        jumpCounter--;
+                    }
+                }    
+            }
+            coyoteCounter = 0;
+        }
+    }
+    
+    private void wallJump()
+    {
+        rb.AddForce(new Vector2(-Mathf.Sign(transform.localScale.x) * wallJumpX, wallJumpY));
+        wallJumpCooldown = 0;
     }
 
     private bool isGrounded()
