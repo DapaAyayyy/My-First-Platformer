@@ -74,6 +74,18 @@ public class Health : MonoBehaviour
 
     }
 
+    public void Respawn()
+    {
+        dead = false;
+        AddHealth(startingHealth);
+        anim.ResetTrigger("die");
+        anim.Play("idle");
+
+        StartCoroutine(Invulnerability());
+        foreach (Behaviour component in components)
+            component.enabled = true;
+    }
+
     //Invincible function
     private IEnumerator Invulnerability()//Invincible function
     {
