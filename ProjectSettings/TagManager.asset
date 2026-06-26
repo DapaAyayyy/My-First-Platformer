@@ -6,6 +6,7 @@ TagManager:
   tags:
   - grounded
   - Enemy
+  - Checkpoint
   layers:
   - Default
   - TransparentFX
